@@ -2,18 +2,13 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-require('dotenv').config();
-
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 // Fetch popular movies
 router.get('/popular', async (req, res) => {
     try {
-
-        const axiosConfig = {
-            method: 'get',
-            url: `${TMDB_BASE_URL}/movie/popular`,
+        const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
             params: {
                 api_key: TMDB_API_KEY,
                 language: 'en-US',
@@ -22,15 +17,17 @@ router.get('/popular', async (req, res) => {
             headers: {
                 'Accept': 'application/json'
             }
-        };
+        });
 
-        console.log('Axios config:', axiosConfig);
-
-        const response = await axios(axiosConfig);
         res.json(response.data);
     } catch (error) {
-        console.error('Error fetching popular movies:', error.message);
-        res.status(500).json({ error: 'Failed to fetch popular movies' });
+        if (error.response) {
+            console.error('TMDB error response:', error.response.status, error.response.data);
+            res.status(error.response.status).json({ error: error.response.data });
+        } else {
+            console.error('Error fetching popular movies:', error.message);
+            res.status(500).json({ error: 'Failed to fetch popular movies' });
+        }
     }
 });
 
@@ -50,12 +47,15 @@ router.get('/search', async (req, res) => {
                 query: query,
                 page: 1,
                 include_adult: false,
+            },
+            headers: {
+                'Accept': 'application/json'
             }
         });
 
         res.json(response.data);
     } catch (error) {
-        console.error('Error searching movies:', error.message);
+        console.error('❌ Error searching movies:', error.message);
         res.status(500).json({ error: 'Failed to search movies' });
     }
 });

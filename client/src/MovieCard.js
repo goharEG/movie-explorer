@@ -1,5 +1,5 @@
 import React from "react";
-
+import Notes from './components/Notes';
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w300";
 
 function MovieCard({ movie }) {
@@ -17,8 +17,10 @@ function MovieCard({ movie }) {
                 </div>
             )}
             <h3>{movie.title}</h3>
+            <p>{movie.overview}</p>
             <p>Rating: {movie.vote_average}</p>
             <p>{movie.release_date}</p>
+            <Notes movieId={movie.id} />
         </div>
     );
 }
